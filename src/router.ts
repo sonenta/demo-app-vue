@@ -1,10 +1,10 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import Home from "./views/Home.vue";
 import Demo from "./views/Demo.vue";
 import Quiz from "./views/Quiz.vue";
 
 export const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: "/", name: "home", component: Home },
     { path: "/demo", name: "demo", component: Demo },
