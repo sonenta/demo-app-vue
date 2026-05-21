@@ -13,7 +13,7 @@ app.use(VerbumiaPlugin, {
   projectId: "demo-verbumia-ca-vue",
   apiKey: "demo-public-key",
   baseUrl: "https://api.verbumia.ca",
-  cdnUrl: "/locales",
+  cdnUrl: `${import.meta.env.BASE_URL}locales`,
   defaultLocale: "en",
   defaultNS: "common",
   namespaces: ["common", "quiz"],

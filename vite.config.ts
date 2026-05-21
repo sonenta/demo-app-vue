@@ -15,7 +15,12 @@ const feedbackProxy = {
   },
 };
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // Served as a sub-app under verbumia.ca/demos/vue/ in production
+  // (rsync target /data/clients/verbumia.ca/www/demos/vue, nginx SPA
+  // fallback owned by the website peer). Dev keeps root for vite preview
+  // + Vercel preview deploys.
+  base: command === "build" ? "/demos/vue/" : "/",
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
@@ -28,4 +33,4 @@ export default defineConfig({
   },
   server: { proxy: feedbackProxy },
   preview: { proxy: feedbackProxy },
-});
+}));
