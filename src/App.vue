@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { useTranslation } from "@verbumia/vue-i18n";
+import { useTranslation } from "@local/vue-i18n";
 import Splash from "./components/Splash.vue";
 import ScenarioRunner from "./components/ScenarioRunner.vue";
 import { activeFeedback, ensureFeedback } from "./feedback/feedback";
@@ -18,7 +18,7 @@ watch(
   { immediate: true },
 );
 
-// Official @verbumia/feedback/vue panel — mounted once near root.
+// Official @sonenta/feedback/vue panel — mounted once near root.
 const FeedbackPanel = computed(() => activeFeedback.value?.FeedbackPanel);
 </script>
 

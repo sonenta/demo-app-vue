@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useTranslation } from "@verbumia/vue-i18n";
+import { useTranslation } from "@local/vue-i18n";
 import {
   scenarioStore,
   SCENARIO_KEYS,

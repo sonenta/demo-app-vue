@@ -1,5 +1,5 @@
 import { reactive } from "vue";
-import type { MissingKeyEvent } from "@verbumia/vue-i18n";
+import type { MissingKeyEvent } from "@local/vue-i18n";
 
 type State = {
   events: MissingKeyEvent[];

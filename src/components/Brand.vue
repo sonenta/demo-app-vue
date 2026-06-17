@@ -4,12 +4,13 @@ withDefaults(defineProps<{ size?: number }>(), { size: 28 });
 
 <template>
   <span class="inline-flex items-center gap-2.5">
-    <svg aria-hidden viewBox="0 0 32 32" :width="size" :height="size" class="shrink-0">
-      <rect width="32" height="32" rx="7" fill="#0e1015" />
-      <path d="M9 9.5l5.6 12.5h2L22 9.5h-2.5l-4 9.4-3.9-9.4z" fill="#10b981" />
+    <svg aria-hidden viewBox="0 0 100 100" :width="size" :height="size" class="shrink-0">
+      <rect width="100" height="100" rx="22" fill="#0e1015" />
+      <text x="45" y="76" text-anchor="middle" font-family="'Times New Roman', Times, Georgia, serif" font-size="80" font-weight="700" fill="#10b981" stroke="#10b981" stroke-width="3" stroke-linejoin="round" paint-order="stroke">S</text>
+      <circle cx="80" cy="70" r="7" fill="#34d399" />
     </svg>
     <span class="text-[1.05rem] font-semibold tracking-tight text-ink-50">
-      Verbumia
+      Sonenta
     </span>
   </span>
 </template>

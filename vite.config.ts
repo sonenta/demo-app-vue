@@ -16,17 +16,17 @@ const feedbackProxy = {
 };
 
 export default defineConfig(({ command }) => ({
-  // Served as a sub-app under verbumia.ca/demos/vue/ in production
-  // (rsync target /data/clients/verbumia.ca/www/demos/vue, nginx SPA
+  // Served as a sub-app under sonenta.com/demos/vue/ in production
+  // (rsync target /data/clients/sonenta.com/www/demos/vue, nginx SPA
   // fallback owned by the website peer). Dev keeps root for vite preview
   // + Vercel preview deploys.
   base: command === "build" ? "/demos/vue/" : "/",
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
-      "@verbumia/vue-i18n": path.resolve(
+      "@local/vue-i18n": path.resolve(
         __dirname,
-        "src/sdk/verbumia-vue-i18n.ts",
+        "src/sdk/sonenta-vue-i18n.ts",
       ),
       "@": path.resolve(__dirname, "src"),
     },

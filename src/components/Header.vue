@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
-import { useTranslation } from "@verbumia/vue-i18n";
+import { useTranslation } from "@local/vue-i18n";
 import Brand from "./Brand.vue";
 import LangSwitcher from "./LangSwitcher.vue";
 
@@ -12,7 +12,7 @@ const { t } = useTranslation();
     class="sticky top-0 z-30 backdrop-blur-md bg-ink-950/75 border-b border-ink-800"
   >
     <div class="mx-auto max-w-6xl flex items-center gap-6 px-6 h-14">
-      <RouterLink to="/" class="flex items-center" aria-label="Verbumia home">
+      <RouterLink to="/" class="flex items-center" aria-label="Sonenta home">
         <Brand />
       </RouterLink>
       <span

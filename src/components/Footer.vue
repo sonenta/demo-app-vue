@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTranslation } from "@verbumia/vue-i18n";
+import { useTranslation } from "@local/vue-i18n";
 import Brand from "./Brand.vue";
 
 const { t } = useTranslation();
@@ -12,7 +12,7 @@ const { t } = useTranslation();
       <p class="text-ink-300 text-sm">{{ t("footer.tagline") }}</p>
       <div class="ml-auto flex items-center gap-5 text-xs text-ink-300 mono">
         <a
-          href="https://github.com/verbumia"
+          href="https://github.com/sonenta/demo-app-vue"
           class="hover:text-ink-50 transition-colors"
         >
           {{ t("footer.repo") }}

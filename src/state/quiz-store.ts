@@ -10,7 +10,7 @@
  * `quiz.q.<n>.a.<1..5>`). Players alternate by question; 1 point per
  * correct answer; highest score after 10 wins. Only question numbers +
  * the correct option live here; every visible string resolves through
- * @verbumia/vue-i18n.
+ * @sonenta/vue-i18n.
  */
 import { reactive } from "vue";
 

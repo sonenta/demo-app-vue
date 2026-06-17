@@ -1,6 +1,6 @@
 /**
- * App-side wiring for the OFFICIAL @verbumia/feedback/vue entry
- * (feedback@0.1.0, contract v4 7980e3d4). Replaces the former local
+ * App-side wiring for the OFFICIAL @sonenta/feedback/vue entry
+ * (feedback@1.2.0, contract v6). Replaces the former local
  * /core stub + hand adapter.
  *
  * Dual-mode (master standard demo pattern):
@@ -14,7 +14,7 @@
  * sessionId is server-minted; no tosVersion (SDK build-time constant, v4).
  */
 import { shallowRef } from "vue";
-import { createFeedback, type VueFeedback } from "@verbumia/feedback/vue";
+import { createFeedback, type VueFeedback } from "@sonenta/feedback/vue";
 import { demoFetch } from "../sdk/feedback-demo-fetch";
 
 const LIVE = import.meta.env.VITE_FEEDBACK_LIVE === "1";
@@ -44,8 +44,10 @@ export const ensureFeedback = (language: string): VueFeedback => {
       // to ONLY quiz strings — site chrome/nav (ns=common) is excluded.
       namespace: "quiz",
       // v5: no explicit keys — the SDK auto-scopes to on-screen strings
-      // via globalThis.__verbumia_key_registry__ (our @verbumia/vue-i18n
-      // stub records rendered t() keys; reset per route). Explicit keys
+      // via globalThis.__verbumia_key_registry__ (our @local/vue-i18n
+      // stub records rendered t() keys; reset per route). The registry
+      // global name is intentionally frozen for cross-scope interop.
+      // Explicit keys
       // remain the SDK's fallback only.
       // default → canned transport (static); live → real network fetch.
       fetchImpl: LIVE ? undefined : demoFetch,

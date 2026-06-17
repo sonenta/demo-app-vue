@@ -2,7 +2,7 @@
  * Canned `fetchImpl` for the DEFAULT (static) demo mode.
  *
  * The deployable showcase (Vercel) must work with zero backend: this
- * mock answers the @verbumia/feedback wire endpoints (c8e86de1) locally
+ * mock answers the @sonenta/feedback wire endpoints (c8e86de1) locally
  * and instantly, so the panel shows a real server-style sessionId, a
  * working rate/suggest flow, and the §3 getStrings hash path — all
  * offline. Opt into the genuine live loop with VITE_FEEDBACK_LIVE=1

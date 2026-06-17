@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useTranslation } from "@verbumia/vue-i18n";
+import { useTranslation } from "@local/vue-i18n";
 import { missingStore } from "../state/missing-store";
 import { scenarioStore } from "../state/scenario-store";
 

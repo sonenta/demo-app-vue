@@ -1,9 +1,12 @@
-# @verbumia/demo-app-vue
+# @sonenta/demo-app-vue
 
-Live showcase + dogfooding app for the **`@verbumia/vue-i18n`** SDK
-(Vue 3 + TypeScript + Vite + Tailwind).
+Live showcase + dogfooding app for **Vue 3 + vue-i18n**: Sonenta
+translations served from the CDN through a thin app-owned adapter, with
+live missing-key handling (Vue 3 + TypeScript + Vite + Tailwind). The
+dedicated first-class binding is **coming soon** — until then this demo
+wires the adapter, aliased `@local/vue-i18n`.
 
-This is one of three Verbumia demo apps — the other two consume the React
+This is one of three Sonenta demo apps — the other two consume the React
 and Svelte SDKs respectively. All three render the same scenario so you can
 compare framework idioms side by side.
 
@@ -16,9 +19,10 @@ compare framework idioms side by side.
   Centrifugo.
 - A `/demo` route with autoplay (`?demo=play` runs once, `?demo=loop` loops)
   for screen recordings and unattended kiosks.
-- A local stub of the SDK at `src/sdk/verbumia-vue-i18n.ts` mirroring the
-  proposed V1 surface — replace with `npm i @verbumia/vue-i18n` once the
-  real package is published from the backend repo.
+- A local stub of the SDK at `src/sdk/sonenta-vue-i18n.ts` mirroring the
+  proposed V1 surface, wired in via a `@local/vue-i18n` alias — to be
+  swapped for the real package once it is published. The binding is not
+  on npm yet, so there is no install command for it today.
 
 ## Run it
 
@@ -43,20 +47,25 @@ SPA rewrites.
 
 ## SDK contract (sketch)
 
+The dedicated first-class Vue binding is **coming soon**. Today the demo wires
+a thin app-owned adapter (aliased `@local/vue-i18n`) that serves translations
+from the Sonenta CDN with live missing-key handling; the sketch below is the
+shape that adapter exposes.
+
 ```ts
 import { createApp } from "vue";
-import { VerbumiaPlugin, useTranslation } from "@verbumia/vue-i18n";
+import { SonentaPlugin, useTranslation } from "@local/vue-i18n";
 import App from "./App.vue";
 
 createApp(App)
-  .use(VerbumiaPlugin, {
+  .use(SonentaPlugin, {
     projectId: "proj_xxx",
-    apiKey: import.meta.env.VITE_VERBUMIA_KEY,
-    baseUrl: "https://api.verbumia.ca",
+    apiKey: import.meta.env.VITE_SONENTA_KEY,
+    baseUrl: "https://api.sonenta.com",
     cdnUrl: "/locales", // or "{baseUrl}/p/{projectId}/{lang}/{namespace}"
     defaultLocale: "en",
     namespaces: ["common"],
-    missingHandlerEndpoint: "https://api.verbumia.ca/v1/missing",
+    missingHandlerEndpoint: "https://api.sonenta.com/v1/missing",
     debounceMs: 5000,
     transport: (batch) => {
       // optional override — POST batch yourself, or pipe to a local panel
@@ -73,7 +82,7 @@ t("hero.title");        // string, reports a MissingKeyEvent if absent
 ```
 
 `transport` and `i18n.ready` are the Vue equivalents of the React surface
-(see `verbumia.ca/demo-app/src/sdk/verbumia-react-i18next.tsx`). Both
+(see `sonenta.com/demo-app/src/sdk/sonenta-react-i18next.tsx`). Both
 SDKs deliberately share these affordances so dogfood patterns are portable.
 
 ## License

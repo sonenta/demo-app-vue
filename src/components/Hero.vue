@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTranslation } from "@verbumia/vue-i18n";
+import { useTranslation } from "@local/vue-i18n";
 
 const { t } = useTranslation();
 </script>

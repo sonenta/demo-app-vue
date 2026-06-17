@@ -1,21 +1,24 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useTranslation } from "@verbumia/vue-i18n";
-import { tokenizeBash, tokenizeTsx, type Token } from "../lib/highlight";
+import { useTranslation } from "@local/vue-i18n";
+import { tokenizeTsx, type Token } from "../lib/highlight";
 
 const { t } = useTranslation();
 
-const INSTALL = `npm install @verbumia/vue-i18n`;
-
+// The dedicated first-class Vue binding is "coming soon" (canonical wording
+// owned by the website). Until it ships, the demo wires a thin app-owned
+// adapter aliased as @local/vue-i18n — never a published @sonenta/ package.
 const USAGE = [
+  `// Vue 3 + vue-i18n — dedicated binding coming soon;`,
+  `// this demo wires a thin app-owned adapter (@local/vue-i18n).`,
   `import { createApp } from "vue";`,
-  `import { VerbumiaPlugin, useTranslation } from "@verbumia/vue-i18n";`,
+  `import { SonentaPlugin, useTranslation } from "@local/vue-i18n";`,
   `import App from "./App.vue";`,
   ``,
   `createApp(App)`,
-  `  .use(VerbumiaPlugin, {`,
+  `  .use(SonentaPlugin, {`,
   `    projectId: "proj_xxx",`,
-  `    apiKey: import.meta.env.VITE_VERBUMIA_KEY,`,
+  `    apiKey: import.meta.env.VITE_SONENTA_KEY,`,
   `    defaultLocale: "en",`,
   `  })`,
   `  .mount("#app");`,
@@ -25,20 +28,15 @@ const USAGE = [
   `// template:  {{ t("hero.title") }}`,
 ].join("\n");
 
-const installTokens = computed<Token[]>(() => tokenizeBash(INSTALL));
 const usageTokens = computed<Token[]>(() => tokenizeTsx(USAGE));
 
-const copiedInstall = ref(false);
 const copiedUsage = ref(false);
 
-const copy = async (which: "install" | "usage") => {
-  const code = which === "install" ? INSTALL : USAGE;
+const copyUsage = async () => {
   try {
-    await navigator.clipboard.writeText(code);
-    if (which === "install") copiedInstall.value = true;
-    else copiedUsage.value = true;
+    await navigator.clipboard.writeText(USAGE);
+    copiedUsage.value = true;
     window.setTimeout(() => {
-      copiedInstall.value = false;
       copiedUsage.value = false;
     }, 1400);
   } catch {
@@ -61,36 +59,23 @@ const copy = async (which: "install" | "usage") => {
       >
         {{ t("install.title") }}
       </h2>
-    </header>
-    <div class="grid lg:grid-cols-2 gap-4">
-      <figure
-        class="rounded-2xl border border-ink-800 bg-ink-900 overflow-hidden shadow-[0_24px_60px_-30px_rgba(0,0,0,0.7)]"
-      >
-        <figcaption
-          class="flex items-center gap-3 px-4 py-2.5 border-b border-ink-800 text-xs"
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <span
+          class="mono text-[11px] uppercase tracking-[0.18em] rounded-full border border-ink-700 px-2.5 py-1 text-ink-200"
         >
-          <span class="flex gap-1.5">
-            <span class="h-2.5 w-2.5 rounded-full bg-ink-700" />
-            <span class="h-2.5 w-2.5 rounded-full bg-ink-700" />
-            <span class="h-2.5 w-2.5 rounded-full bg-ink-700" />
-          </span>
-          <span class="mono uppercase tracking-[0.18em] text-ink-300">
-            terminal
-          </span>
-          <button
-            type="button"
-            class="ml-auto mono text-[10px] uppercase tracking-[0.18em] text-ink-300 hover:text-emerald-400 transition-colors"
-            @click="copy('install')"
-          >
-            {{ copiedInstall ? "copied ✓" : "copy" }}
-          </button>
-        </figcaption>
-        <pre class="overflow-x-auto px-5 py-4 text-[13px] leading-relaxed mono"><code><span
-              v-for="(tok, i) in installTokens"
-              :key="i"
-              :class="`tok-${tok.kind}`"
-            >{{ tok.text }}</span></code></pre>
-      </figure>
+          {{ t("binding.label") }}
+        </span>
+        <span
+          class="mono text-[11px] uppercase tracking-[0.18em] rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-emerald-300"
+        >
+          {{ t("binding.status") }}
+        </span>
+      </div>
+      <p class="mt-4 text-sm md:text-base leading-relaxed text-ink-300">
+        {{ t("binding.positioning") }}
+      </p>
+    </header>
+    <div class="max-w-3xl">
       <figure
         class="rounded-2xl border border-ink-800 bg-ink-900 overflow-hidden shadow-[0_24px_60px_-30px_rgba(0,0,0,0.7)]"
       >
@@ -108,7 +93,7 @@ const copy = async (which: "install" | "usage") => {
           <button
             type="button"
             class="ml-auto mono text-[10px] uppercase tracking-[0.18em] text-ink-300 hover:text-emerald-400 transition-colors"
-            @click="copy('usage')"
+            @click="copyUsage"
           >
             {{ copiedUsage ? "copied ✓" : "copy" }}
           </button>

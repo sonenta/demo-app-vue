@@ -1,8 +1,8 @@
 /**
- * Local stub of @verbumia/vue-i18n.
+ * Local stub of @sonenta/vue-i18n.
  *
  * Mirrors the V1 contract sketched by the backend peer (Vue idiom):
- *   app.use(VerbumiaPlugin, { projectId, apiKey, baseUrl, cdnUrl,
+ *   app.use(SonentaPlugin, { projectId, apiKey, baseUrl, cdnUrl,
  *                              defaultLocale, defaultNS, namespaces,
  *                              missingHandlerEndpoint, debounceMs, transport })
  *   useTranslation(ns?) ->
@@ -17,7 +17,7 @@
  * transport to intercept events for the live panel; in production the same
  * batches reach the backend's /v1/missing endpoint.
  *
- * Replace this file with `npm i @verbumia/vue-i18n` once the real package
+ * Replace this file with `npm i @sonenta/vue-i18n` once the real package
  * is published — same surface, same behaviour.
  */
 import {
@@ -36,7 +36,7 @@ export type Locale = string;
 export type Namespace = string;
 
 /* ---- rendered-key registry (v5 auto-scoping contract) ----
- * @verbumia/feedback resolves on-screen strings via
+ * @sonenta/feedback resolves on-screen strings via
  * globalThis.__verbumia_key_registry__.snapshot() when no explicit keys
  * are passed. We record every resolved t() key and reset per view (router
  * hook) so the feedback panel auto-scopes to the CURRENT screen. */
@@ -63,10 +63,10 @@ if (typeof globalThis !== "undefined") {
   };
 }
 
-/* NOTE: @verbumia/vue-i18n has NO add-on `plugins[]` slot — the i18n
- * plugin slot is React-only (@verbumia/react-i18next). @verbumia/feedback
+/* NOTE: @sonenta/vue-i18n has NO add-on `plugins[]` slot — the i18n
+ * plugin slot is React-only (@sonenta/react-i18next). @sonenta/feedback
  * integrates in Vue via its framework-agnostic /core client + an
- * app-owned adapter (see src/sdk/verbumia-feedback-vue.ts), not through
+ * app-owned adapter (see src/sdk/sonenta-feedback-vue.ts), not through
  * this provider. */
 
 export type MissingKeyEvent = {
@@ -81,7 +81,7 @@ export type MissingKeyTransport = (
   batch: MissingKeyEvent[],
 ) => void | Promise<void>;
 
-export type VerbumiaPluginOptions = {
+export type SonentaPluginOptions = {
   projectId: string;
   apiKey: string;
   baseUrl?: string;
@@ -103,7 +103,7 @@ export type TOptions = {
 type Bundle = Record<string, string>;
 type LocaleBundles = Record<Namespace, Bundle>;
 
-type ResolvedOptions = VerbumiaPluginOptions & {
+type ResolvedOptions = SonentaPluginOptions & {
   cdnUrl: string;
   defaultLocale: Locale;
   defaultNS: Namespace;
@@ -125,7 +125,7 @@ type I18nCtx = {
   ) => void;
 };
 
-export const VerbumiaInjectionKey: InjectionKey<I18nCtx> = Symbol("verbumia");
+export const SonentaInjectionKey: InjectionKey<I18nCtx> = Symbol("sonenta");
 
 const interpolate = (
   template: string,
@@ -159,8 +159,8 @@ const resolveUrl = (
         .replace("{namespace}", ns)
     : `${cdnUrl}/${locale}/${ns}.json`;
 
-export const VerbumiaPlugin = {
-  install(app: App, rawOptions: VerbumiaPluginOptions) {
+export const SonentaPlugin = {
+  install(app: App, rawOptions: SonentaPluginOptions) {
     const options: ResolvedOptions = {
       cdnUrl: "/locales",
       defaultLocale: "en",
@@ -271,7 +271,7 @@ export const VerbumiaPlugin = {
       reportMissing,
     };
 
-    app.provide(VerbumiaInjectionKey, ctx);
+    app.provide(SonentaInjectionKey, ctx);
   },
 };
 
@@ -295,10 +295,10 @@ export type UseTranslation = {
 };
 
 export function useTranslation(ns?: Namespace): UseTranslation {
-  const ctx = inject(VerbumiaInjectionKey);
+  const ctx = inject(SonentaInjectionKey);
   if (!ctx) {
     throw new Error(
-      "[verbumia] useTranslation called outside of app.use(VerbumiaPlugin).",
+      "[sonenta] useTranslation called outside of app.use(SonentaPlugin).",
     );
   }
   const namespace = ns ?? ctx.options.defaultNS;

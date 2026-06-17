@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
-import { useTranslation } from "@verbumia/vue-i18n";
+import { useTranslation } from "@local/vue-i18n";
 import Header from "../components/Header.vue";
 import MissingKeysPanel from "../components/MissingKeysPanel.vue";
 import { scenarioStore, SCENARIO_KEYS } from "../state/scenario-store";

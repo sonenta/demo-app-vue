@@ -13,5 +13,5 @@ export const router = createRouter({
 });
 
 // §0e: no per-route reset — the rendered-key registry is mount-tracked +
-// ref-counted in @verbumia/vue-i18n (keys drop when their view unmounts;
+// ref-counted in @sonenta/vue-i18n (keys drop when their view unmounts;
 // persistent strings survive navigation).

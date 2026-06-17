@@ -1,10 +1,10 @@
 {
-  "name": "@verbumia/demo-app-vue",
+  "name": "@sonenta/demo-app-vue",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
-  "description": "Live showcase + dogfooding app for the @verbumia/vue-i18n SDK.",
+  "description": "Live showcase + dogfooding app for Vue 3 + vue-i18n: Sonenta translations via a thin app-owned adapter, with live missing-key handling (dedicated binding coming soon).",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -12,7 +12,7 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@verbumia/feedback": "^0.2.0",
+    "@sonenta/feedback": "^1.2.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
