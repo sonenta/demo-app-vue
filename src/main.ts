@@ -23,6 +23,9 @@ app.use(
     cdnBase: `${import.meta.env.BASE_URL}cdn`,
     version: "main",
     apiBase: "https://api.sonenta.com",
+    // Bundles are flat-keyed ("hero.lede"); set explicitly so resolution does
+    // not depend on version-metadata auto-detection (disabled below).
+    keySeparator: false,
     defaultLocale: "en",
     defaultNS: "common",
     namespaces: ["common", "quiz"],
