@@ -1,30 +1,28 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useTranslation } from "@local/vue-i18n";
+import { useTranslation } from "@sonenta/vue-i18n";
 import { tokenizeTsx, type Token } from "../lib/highlight";
 
 const { t } = useTranslation();
 
-// The dedicated first-class Vue binding is "coming soon" (canonical wording
-// owned by the website). Until it ships, the demo wires a thin app-owned
-// adapter aliased as @local/vue-i18n — never a published @sonenta/ package.
+// Official first-class Vue 3 binding — this demo runs on @sonenta/vue-i18n.
 const USAGE = [
-  `// Vue 3 + vue-i18n — dedicated binding coming soon;`,
-  `// this demo wires a thin app-owned adapter (@local/vue-i18n).`,
+  `// Vue 3 — official Sonenta binding`,
+  `// npm i @sonenta/vue-i18n`,
   `import { createApp } from "vue";`,
-  `import { SonentaPlugin, useTranslation } from "@local/vue-i18n";`,
+  `import { createSonentaI18n, useTranslation } from "@sonenta/vue-i18n";`,
   `import App from "./App.vue";`,
   ``,
   `createApp(App)`,
-  `  .use(SonentaPlugin, {`,
-  `    projectId: "proj_xxx",`,
-  `    apiKey: import.meta.env.VITE_SONENTA_KEY,`,
+  `  .use(createSonentaI18n({`,
+  `    token: import.meta.env.VITE_SONENTA_KEY,`,
+  `    projectUuid: "proj_xxx",`,
   `    defaultLocale: "en",`,
-  `  })`,
+  `  }))`,
   `  .mount("#app");`,
   ``,
   `// any component`,
-  `const { t, i18n } = useTranslation();`,
+  `const { t, setLanguage } = useTranslation();`,
   `// template:  {{ t("hero.title") }}`,
 ].join("\n");
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { useTranslation } from "@local/vue-i18n";
+import { useTranslation } from "@sonenta/vue-i18n";
 import Header from "../components/Header.vue";
 import Footer from "../components/Footer.vue";
 import {

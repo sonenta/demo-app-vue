@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useTranslation } from "@local/vue-i18n";
+import { useTranslation } from "@sonenta/vue-i18n";
 
-const { t, i18n } = useTranslation();
+const { t, language, setLanguage } = useTranslation();
 
 const LOCALES = [
   { code: "fr", labelKey: "lang.fr" },
@@ -22,14 +22,14 @@ const LOCALES = [
       type="button"
       :class="[
         'px-3 py-1 rounded-full transition-colors uppercase tracking-wider',
-        i18n.language === l.code
+        language === l.code
           ? 'bg-ink-50 text-ink-950'
           : 'text-ink-300 hover:text-ink-50',
       ]"
-      :aria-pressed="i18n.language === l.code"
+      :aria-pressed="language === l.code"
       :aria-label="t(l.labelKey)"
       :lang="l.code"
-      @click="i18n.changeLanguage(l.code)"
+      @click="setLanguage(l.code)"
     >
       {{ l.code }}
     </button>

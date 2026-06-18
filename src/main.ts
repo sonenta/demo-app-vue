@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import { router } from "./router";
-import { SonentaPlugin } from "@local/vue-i18n";
+import { createSonentaI18n } from "@sonenta/vue-i18n";
 import { missingStore } from "./state/missing-store";
 import "./index.css";
 
@@ -9,22 +9,28 @@ const app = createApp(App);
 
 app.use(router);
 
-app.use(SonentaPlugin, {
-  // Canonical shared demo project (slug "demo-public"); the real CDN bundles
-  // live under this UUID. Cosmetic here since the demo serves LOCAL locales
-  // (cdnUrl below), but kept canonical + in sync with feedback.ts. apiKey is
-  // a placeholder — demo-public CDN bundles are public, no auth (per backend).
-  projectId: "06a07109-3e3c-7bd7-8000-95368a87bd2e",
-  apiKey: "demo-public-key",
-  baseUrl: "https://api.sonenta.com",
-  cdnUrl: `${import.meta.env.BASE_URL}locales`,
-  defaultLocale: "en",
-  defaultNS: "common",
-  namespaces: ["common", "quiz"],
-  missingHandlerEndpoint: "https://api.sonenta.com/v1/missing",
-  debounceMs: 5000,
-  transport: (batch) => missingStore.pushBatch(batch),
-});
+// Official @sonenta/vue-i18n binding (beta 0.9.0 — replaces the former local
+// stub). The demo ships its own bundles in the SDK's CDN path layout under
+// /cdn (`{cdnBase}/p/{projectUuid}/{version}/latest/{lang}/{ns}.json`), so it
+// stays offline / Vercel-safe while exercising the real SDK fetch pipeline.
+// projectUuid = the canonical "demo-public" project (backend). token is a
+// placeholder — bundles are public, no auth; missing-key delivery is
+// redirected to the in-app inspector via `transport` (no network POST).
+app.use(
+  createSonentaI18n({
+    token: "demo-public-key",
+    projectUuid: "06a07109-3e3c-7bd7-8000-95368a87bd2e",
+    cdnBase: `${import.meta.env.BASE_URL}cdn`,
+    version: "main",
+    apiBase: "https://api.sonenta.com",
+    defaultLocale: "en",
+    defaultNS: "common",
+    namespaces: ["common", "quiz"],
+    disableLanguageManifest: true,
+    disableLanguageCatalog: true,
+    transport: (batch) => missingStore.pushBatch(batch),
+  }),
+);
 
 // @sonenta/feedback wiring lives in src/feedback/feedback.ts (official
 // /vue entry, dual-mode) and is mounted by App.vue, kept in sync with the

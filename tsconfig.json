@@ -21,7 +21,6 @@
     "types": ["vite/client", "node"],
     "baseUrl": ".",
     "paths": {
-      "@local/vue-i18n": ["src/sdk/sonenta-vue-i18n.ts"],
       "@/*": ["src/*"]
     }
   },

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useTranslation } from "@local/vue-i18n";
+import { useTranslation } from "@sonenta/vue-i18n";
 import { missingStore } from "../state/missing-store";
 import { scenarioStore } from "../state/scenario-store";
 
-const { t, i18n } = useTranslation();
+const { t, language } = useTranslation();
 
 const events = computed(() => missingStore.state.events);
 const lastBatchAt = computed(() => missingStore.state.lastBatchAt);
@@ -118,24 +118,24 @@ const formatTime = (ts: number, locale: string) => {
       </li>
       <li
         v-for="(ev, i) in events"
-        :key="`${ev.locale}-${ev.ns}-${ev.key}-${ev.ts}-${i}`"
+        :key="`${ev.language_code}-${ev.namespace}-${ev.key}-${ev.ts}-${i}`"
         class="px-5 py-3 grid grid-cols-[1fr_auto_auto] items-center gap-3 slide-in"
       >
         <code class="mono text-[13px] text-ink-100 truncate" :title="ev.key">
-          <span class="text-emerald-400">{{ ev.ns }}</span>
+          <span class="text-emerald-400">{{ ev.namespace }}</span>
           <span class="text-ink-300">:</span>
           {{ ev.key }}
         </code>
         <span
           class="mono text-[10px] uppercase tracking-[0.18em] text-amber-bright bg-amber-soft px-1.5 py-0.5 rounded-sm"
         >
-          {{ ev.locale }}
+          {{ ev.language_code }}
         </span>
         <time
           class="mono text-[11px] text-ink-300 tabular-nums"
           :datetime="new Date(ev.ts).toISOString()"
         >
-          {{ formatTime(ev.ts, i18n.language) }}
+          {{ formatTime(ev.ts, language) }}
         </time>
       </li>
     </ol>

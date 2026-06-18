@@ -44,8 +44,8 @@ export const ensureFeedback = (language: string): VueFeedback => {
       // to ONLY quiz strings — site chrome/nav (ns=common) is excluded.
       namespace: "quiz",
       // v5: no explicit keys — the SDK auto-scopes to on-screen strings
-      // via globalThis.__verbumia_key_registry__ (our @local/vue-i18n
-      // stub records rendered t() keys; reset per route). The registry
+      // via globalThis.__verbumia_key_registry__ (the official @sonenta/vue-i18n
+      // binding records rendered t() keys; reset per route). The registry
       // global name is intentionally frozen for cross-scope interop.
       // Explicit keys
       // remain the SDK's fallback only.

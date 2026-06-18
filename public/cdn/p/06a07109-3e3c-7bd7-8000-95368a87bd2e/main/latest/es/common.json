@@ -32,7 +32,7 @@
   "install.eyebrow": "Conecta. Lanza.",
   "install.title": "Un fragmento y ya traduces.",
   "binding.label": "Vue 3 + vue-i18n",
-  "binding.status": "Próximamente",
+  "binding.status": "Beta",
   "binding.positioning": "Showcase Vue 3 + vue-i18n para Sonenta, la capa de contenido adaptativo: contenido servido desde el CDN de Sonenta mediante un adaptador ligero del lado de la app, con gestión de claves faltantes en directo.",
   "features.title": "Tres cosas que no encontrarás en ningún otro sitio",
   "features.one.title": "Detector de claves faltantes en runtime",

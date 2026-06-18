@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
-import { useTranslation } from "@local/vue-i18n";
+import { useTranslation } from "@sonenta/vue-i18n";
 import Header from "../components/Header.vue";
 import MissingKeysPanel from "../components/MissingKeysPanel.vue";
 import { scenarioStore, SCENARIO_KEYS } from "../state/scenario-store";
 
-const { t, i18n } = useTranslation();
+const { t, ready } = useTranslation();
 const route = useRoute();
 
 const mode = computed(() => scenarioStore.state.mode);
@@ -26,7 +26,7 @@ const readDemoParam = (): string | null => {
 
 const startScenarioForRoute = () => {
   // /demo defaults to loop unless an explicit ?demo=play is set.
-  if (!i18n.ready) return;
+  if (!ready.value) return;
   const demo = readDemoParam();
   if (demo === "play") scenarioStore.start("playing");
   else scenarioStore.start("looping");
@@ -37,7 +37,7 @@ onMounted(() => {
 });
 
 watch(
-  () => i18n.ready,
+  () => ready.value,
   (ready) => {
     if (ready) startScenarioForRoute();
   },

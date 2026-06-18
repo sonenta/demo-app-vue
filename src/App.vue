@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { useTranslation } from "@local/vue-i18n";
+import { useTranslation } from "@sonenta/vue-i18n";
 import Splash from "./components/Splash.vue";
 import ScenarioRunner from "./components/ScenarioRunner.vue";
 import { activeFeedback, ensureFeedback } from "./feedback/feedback";
 
-const { i18n } = useTranslation();
+const { language, ready } = useTranslation();
 
 // Keep <html lang> + the active feedback instance synced to the locale,
 // so the official panel rates the language currently on screen.
 watch(
-  () => i18n.language,
+  () => language.value,
   (lang) => {
     document.documentElement.lang = lang;
     ensureFeedback(lang);
@@ -23,13 +23,13 @@ const FeedbackPanel = computed(() => activeFeedback.value?.FeedbackPanel);
 </script>
 
 <template>
-  <Splash :ready="i18n.ready" />
+  <Splash :ready="ready" />
   <ScenarioRunner />
   <div
     class="min-h-screen flex flex-col transition-opacity duration-300"
-    :class="i18n.ready ? 'opacity-100' : 'opacity-0'"
+    :class="ready ? 'opacity-100' : 'opacity-0'"
   >
     <RouterView />
   </div>
-  <component :is="FeedbackPanel" v-if="FeedbackPanel" :key="i18n.language" />
+  <component :is="FeedbackPanel" v-if="FeedbackPanel" :key="language" />
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTranslation } from "@local/vue-i18n";
+import { useTranslation } from "@sonenta/vue-i18n";
 import Brand from "./Brand.vue";
 
 const { t } = useTranslation();

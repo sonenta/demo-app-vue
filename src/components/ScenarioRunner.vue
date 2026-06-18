@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTranslation } from "@local/vue-i18n";
+import { useTranslation } from "@sonenta/vue-i18n";
 import { scenarioStore } from "../state/scenario-store";
 import { missingStore } from "../state/missing-store";
 

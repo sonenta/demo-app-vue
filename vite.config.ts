@@ -24,10 +24,6 @@ export default defineConfig(({ command }) => ({
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
-      "@local/vue-i18n": path.resolve(
-        __dirname,
-        "src/sdk/sonenta-vue-i18n.ts",
-      ),
       "@": path.resolve(__dirname, "src"),
     },
   },

@@ -32,7 +32,7 @@
   "install.eyebrow": "Branche. Livre.",
   "install.title": "Un extrait et vous traduisez.",
   "binding.label": "Vue 3 + vue-i18n",
-  "binding.status": "Bientôt",
+  "binding.status": "Bêta",
   "binding.positioning": "Showcase Vue 3 + vue-i18n pour Sonenta, la couche de contenu adaptatif : contenu servi par le CDN Sonenta via un adaptateur léger côté app, avec gestion des clés manquantes en direct.",
   "features.title": "Trois choses qu'on ne trouve nulle part ailleurs",
   "features.one.title": "Détecteur de clés manquantes en runtime",
