@@ -158,28 +158,54 @@ else
     echo "deploy: no lockfile (need package-lock.json or pnpm-lock.yaml)" >&2; exit 2
 fi
 
-# ---- build ---------------------------------------------------------------
+# ---- build (in a throwaway worktree pinned to $GIT_SHA) -------------------
+# We do NOT build from the working tree. A working-tree build ships your commit
+# PLUS whatever is lying around uncommitted — demo-app nearly put another peer's
+# half-built LoginForm on the live marketing page that way, and nothing flags it
+# (build green, rsync clean, site 200). Building a clean checkout of $GIT_SHA
+# makes the artifact ADDRESSABLE BY A COMMIT: --force-dirty can still let you
+# deploy from a dirty tree, but stray code cannot reach the artifact.
+BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/demo-app-vue-deploy.XXXXXX")
+cleanup() {
+    git worktree remove --force "$BUILD_DIR" >/dev/null 2>&1 || rm -rf "$BUILD_DIR"
+}
+trap cleanup EXIT
+
+echo "==> checkout $GIT_SHA into a clean worktree"
+run "git worktree add --detach --quiet '$BUILD_DIR' '$GIT_SHA'"
+
+# A CLEAN CHECKOUT HAS NO GITIGNORED FILES — carry the operator env across
+# explicitly. Omitting this silently drops build-time secrets (demo-app's clean
+# checkout re-introduced `Authorization: ApiKey undefined`, reintroducing an
+# already-fixed bug via the fix for a different one). We have no env file today;
+# this is here so adding one later cannot break the deploy silently.
+if [[ -f "$ENV_FILE" ]]; then
+    echo "    carrying $(basename "$ENV_FILE") into the clean checkout"
+    run "mkdir -p '$BUILD_DIR/deploy' && cp '$ENV_FILE' '$BUILD_DIR/deploy/'"
+fi
+
 echo "==> install"
-run "${INSTALL[@]}"
+run "cd '$BUILD_DIR' && ${INSTALL[*]}"
 
 echo "==> build (sha=$GIT_SHA, branch=$GIT_BRANCH)"
-run "${BUILD[@]}"
+run "cd '$BUILD_DIR' && ${BUILD[*]}"
 
-if [[ ! -d dist ]] || [[ ! -f dist/index.html ]]; then
+DIST="$BUILD_DIR/dist"
+if [[ $DRY_RUN -eq 0 ]] && { [[ ! -d "$DIST" ]] || [[ ! -f "$DIST/index.html" ]]; }; then
     echo "deploy: dist/ missing or empty after build" >&2; exit 1
 fi
 
 # Stamp the bundle with the source commit so `curl /version.txt` confirms
 # what's actually live.
 TS=$(date -u +%Y%m%d-%H%M%SZ)
-printf '%s\n%s\n%s\n' "$GIT_SHA" "$GIT_BRANCH" "$TS" > dist/version.txt
+printf '%s\n%s\n%s\n' "$GIT_SHA" "$GIT_BRANCH" "$TS" > "$DIST/version.txt"
 
 # ---- push ----------------------------------------------------------------
 echo "==> rsync → $DEPLOY_SSH_HOST:$DEPLOY_ROOT/"
 # Flat docroot at $DEPLOY_ROOT (which is the demos/vue subtree, fully
 # owned by this peer — no excludes needed). --delete drops stale files
 # from previous builds. Trailing slash on dist/ copies the CONTENTS.
-run "rsync -avz --delete --human-readable dist/ '$DEPLOY_SSH_HOST:$DEPLOY_ROOT/'"
+run "rsync -avz --delete --human-readable '$DIST/' '$DEPLOY_SSH_HOST:$DEPLOY_ROOT/'"
 
 echo
 echo "Deployed."
