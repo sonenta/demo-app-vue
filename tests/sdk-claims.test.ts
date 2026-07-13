@@ -91,3 +91,43 @@ describe("locale switch", () => {
     expect(w.find("h1").element).toBe(node); // patched in place, not remounted
   }, 12000);
 });
+
+/**
+ * INFINITE-RENDER-LOOP GUARD (the hazard behind the park).
+ *
+ * The missing-key "park" exists to stop a render loop: a component renders a
+ * missing key -> the SDK writes it back -> i18next emits 'added' -> the binding
+ * re-renders -> it renders the missing key again. The park is a SILENT
+ * addResource precisely so it never reopens that loop (i18n-core's own words).
+ * sdk is reshaping the park in 2.6.1 (park NESTED instead of flat) because the
+ * un-park removed that guard in react-i18next — and the loop is FATAL on RN.
+ *
+ * This demo renders missing keys on purpose (the /demo autoplay fires four of
+ * them, on a loop). So if a future engine reshapes the park and drops the
+ * silence, THIS is the test that catches it — a hang or a render explosion
+ * here, not a wedged browser tab in production.
+ */
+describe("missing key does not trigger a render loop", () => {
+  it("settles after a bounded number of renders", async () => {
+    let renders = 0;
+    const plugin = withI18n();
+    const Missing = defineComponent({
+      setup() {
+        const { t, ready } = useTranslation();
+        return () => {
+          renders++;
+          return h("p", { "data-ready": String(ready.value) }, t("totally.absent.key"));
+        };
+      },
+    });
+    const w = mount(Missing, { global: { plugins: [plugin] } });
+    await waitFor(() => w.find("p").attributes("data-ready") === "true");
+
+    const settled = renders;
+    await new Promise((r) => setTimeout(r, 300)); // let any loop run away
+
+    expect(w.find("p").text()).toBe("totally.absent.key"); // still renders raw
+    expect(renders - settled).toBeLessThan(3); // no runaway re-render
+    expect(renders).toBeLessThan(15); // bounded overall
+  }, 10000);
+});
