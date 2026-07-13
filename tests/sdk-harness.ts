@@ -9,6 +9,16 @@
  * The one rule it enforces: bundles are served from the SAME static files the
  * app ships (public/cdn), through an injected fetchImpl — so a green here is a
  * statement about the real SDK against the real bundles, not against a mock.
+ *
+ * PORTING WARNING — `fetchImpl` IS NOT A UNIVERSAL SEAM.
+ * vue-i18n, svelte-i18n and next accept `fetchImpl` in their options and forward
+ * it to start(). @sonenta/react-i18next DOES NOT: its provider calls `start()`
+ * with no argument, and `SonentaConfig` has no `fetchImpl`, so the key here is
+ * SILENTLY IGNORED on React and the SDK hits the REAL NETWORK. Verified in the
+ * published tarball (2.6.1): no `fetchImpl` in the typings, `.start()` with no
+ * arg. It type-checks clean and does nothing — a booby trap, not an error.
+ * Until react-i18next 2.7.0 adds the seam, a React port must stub
+ * `globalThis.fetch` BEFORE mounting instead.
  */
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
