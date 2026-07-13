@@ -81,13 +81,18 @@ describe("locale switch", () => {
     const en = w.find("h1").text();
     expect(en).toBe("Ship in every language.");
 
-    // NB: vue-i18n exposes this as setLanguage; sdk has ruled setLocale canonical
-    // (setLanguage kept as an alias) but that release is not on npm yet.
     await plugin.i18n.setLocale("fr");
     await waitFor(() => w.find("h1").text() !== en);
 
+    // ASSERT THE ACTUAL FRENCH STRING, not merely "not English".
+    // This test used to assert `.not.toBe(en)` — and it PASSED while the locale
+    // switch was BROKEN: i18n-core <=1.1.4 dropped a custom fetchImpl on
+    // setLocale(), fell back to the global fetch, failed to load the fr bundle,
+    // and degraded to rendering the RAW KEY. "hero.title.line1" is not English,
+    // so the assertion was satisfied by the bug. A "not the old value" assertion
+    // cannot tell a translation from a failure. Needs i18n-core >= 1.1.6.
+    expect(w.find("h1").text()).toBe("Livrez dans toutes les langues.");
     expect(w.find("h1").attributes("data-lang")).toBe("fr");
-    expect(w.find("h1").text()).not.toBe(en);
     expect(w.find("h1").element).toBe(node); // patched in place, not remounted
   }, 12000);
 });
