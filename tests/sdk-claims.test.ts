@@ -127,3 +127,32 @@ describe("P0: an empty key must not wipe the catalog", () => {
     expect(plugin.i18n.t("hero.title.line1")).toBe("Ship in every language.");
   }, 12000);
 });
+
+/**
+ * TRIPWIRE — t(undefined) / t(null) still THROW (reported to sdk, unfixed as of
+ * i18n-core 1.1.9).
+ *
+ * The P0 (catalog wipe) is fixed: the catalog now survives every falsy key. But
+ * sdk's own advisory tells customers to audit `t(someVar)` where the variable
+ * "can ever be empty OR UNDEFINED" — and the nullish shapes never reach the
+ * `if (!key) return` guard, because something calls key.indexOf() first. They
+ * throw a TypeError instead.
+ *
+ * That matters more in Vue than in React: a throw inside render hits an error
+ * boundary in React; in Vue it kills the component. A customer following sdk's
+ * own how-to-check advice finds the undefined case and hits a crash.
+ *
+ * `it.fails` = this MUST throw today. It goes RED when sdk moves the guard
+ * earlier (or coerces), at which point drop `.fails` and assert the graceful
+ * return. My app never calls t(undefined) — every call site is fed from a static
+ * array — so this tracks an SDK defect, not a bug of mine.
+ */
+describe("SDK defect tracker: nullish keys", () => {
+  it.fails("t(undefined) throws instead of returning gracefully", async () => {
+    const plugin = withI18n();
+    mount(defineComponent({ setup: () => () => h("i") }), { global: { plugins: [plugin] } });
+    await waitFor(() => plugin.i18n.ready, 8000);
+
+    expect(() => plugin.i18n.t(undefined as unknown as string)).not.toThrow();
+  }, 12000);
+});
