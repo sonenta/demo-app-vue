@@ -93,22 +93,32 @@ describe("locale switch", () => {
 });
 
 /**
- * INFINITE-RENDER-LOOP GUARD (the hazard behind the park).
+ * "RENDER LOOP GUARD" — AND AN HONEST LABEL ON IT.
  *
- * The missing-key "park" exists to stop a render loop: a component renders a
- * missing key -> the SDK writes it back -> i18next emits 'added' -> the binding
- * re-renders -> it renders the missing key again. The park is a SILENT
- * addResource precisely so it never reopens that loop (i18n-core's own words).
- * sdk is reshaping the park in 2.6.1 (park NESTED instead of flat) because the
- * un-park removed that guard in react-i18next — and the loop is FATAL on RN.
+ * The hazard: a component renders a missing key -> the SDK's missing handler
+ * writes it back -> i18next emits 'added' -> the binding re-renders -> it
+ * renders the missing key again. sdk feared their un-park had removed the guard
+ * against this and was about to reshape the park to restore it.
  *
- * This demo renders missing keys on purpose (the /demo autoplay fires four of
- * them, on a loop). So if a future engine reshapes the park and drops the
- * silence, THIS is the test that catches it — a hang or a render explosion
- * here, not a wedged browser tab in production.
+ * I TRIED TO INDUCE THE LOOP AND COULD NOT. Mutating the SHIPPED engine in
+ * node_modules (my own rule: if you cannot mutate the code, mutate the
+ * dependency):
+ *   - park made NON-silent (silent:false)            -> no loop, renders bounded
+ *   - AND the dedup early-return disabled            -> STILL no loop
+ *   - control: park made to write a marker value     -> test FAILED with the
+ *     marker on screen, proving the mutated path really did execute
+ * So in Vue the loop does not reproduce even with BOTH engine guards removed.
+ * Almost certainly because this binding re-renders off the engine's own _notify,
+ * not off i18next store events (which is what react-i18next binds).
+ *
+ * WHAT THIS TEST THEREFORE IS: NOT a detector of engine-side park changes — it
+ * demonstrably cannot fail on those. It only guards the BINDING: if @sonenta/
+ * vue-i18n ever starts re-rendering on i18next 'added' events, this goes red.
+ * Labelled honestly rather than deleted, because a test whose scope is
+ * overstated is exactly the "theatre" that shipped a hollow P1 guard today.
  */
-describe("missing key does not trigger a render loop", () => {
-  it("settles after a bounded number of renders", async () => {
+describe("missing key does not wedge the binding", () => {
+  it("settles after a bounded number of renders (guards the BINDING, not the engine)", async () => {
     let renders = 0;
     const plugin = withI18n();
     const Missing = defineComponent({
