@@ -9,7 +9,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@sonenta/feedback": "^1.2.0",
@@ -20,12 +21,16 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@sonenta/in-context": "^1.2.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^25.6.0",
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.11",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.5",
+    "vitest": "^4.1.10",
     "vue-tsc": "^2.2.0"
   }
 }
