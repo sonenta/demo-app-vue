@@ -22,7 +22,7 @@ const USAGE = [
   `  .mount("#app");`,
   ``,
   `// any component`,
-  `const { t, setLanguage } = useTranslation();`,
+  `const { t, setLocale } = useTranslation();`,
   `// template:  {{ t("hero.title") }}`,
 ].join("\n");
 

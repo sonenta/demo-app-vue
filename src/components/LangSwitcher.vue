@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTranslation } from "@sonenta/vue-i18n";
 
-const { t, language, setLanguage } = useTranslation();
+const { t, language, setLocale } = useTranslation();
 
 const LOCALES = [
   { code: "fr", labelKey: "lang.fr" },
@@ -29,7 +29,7 @@ const LOCALES = [
       :aria-pressed="language === l.code"
       :aria-label="t(l.labelKey)"
       :lang="l.code"
-      @click="setLanguage(l.code)"
+      @click="setLocale(l.code)"
     >
       {{ l.code }}
     </button>

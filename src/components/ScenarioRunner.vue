@@ -9,7 +9,7 @@ import { missingStore } from "../state/missing-store";
  * exactly as a real user click would). Each view decides when to actually
  * start the scenario — see Home.vue and Demo.vue.
  */
-const { t, i18n } = useTranslation();
+const { t, resetMissingDedup } = useTranslation();
 
 scenarioStore.attach(
   (key) => {
@@ -20,8 +20,9 @@ scenarioStore.attach(
     // The SDK dedups a missing key per instance — without this, the loop's
     // 2nd cycle onward re-fires the same keys, the SDK reports NOTHING, and
     // the inspector stays empty for the rest of the capture (verified: cycle 1
-    // reports 2 misses, cycle 2 reports 0). Needs i18n-core >= 1.1.1.
-    i18n.resetMissingDedup();
+    // reports 2 misses, cycle 2 reports 0). Exposed on the binding since
+    // @sonenta/vue-i18n 1.1.0 (was an engine escape hatch before).
+    resetMissingDedup();
   },
 );
 </script>
