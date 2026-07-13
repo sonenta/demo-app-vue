@@ -7,10 +7,17 @@
  * value -> screen must repaint. Editing a key that ALREADY had a value (see
  * in-context-repaint.test.ts) proves only the easy path.
  *
- * The park-shadow P1 (sdk): i18next PARKS a missing key FLAT
+ * The park-shadow P1: the SDK's OWN missing handler parks a missing key FLAT
  * ({"hero.title": "hero.title"}) while an in-context edit writes NESTED — and
  * the flat park WINS the lookup, so the edit lands and the screen never
  * changes. Invisible on a key that was already present.
+ *
+ * NB: it was first reported (by sdk, to five peers and the changelog) as
+ * i18next's saveMissing doing the parking. That is FALSE — demo-app disproved
+ * it with a control: plain i18next, identical config, no SDK, does NOT park.
+ * The park is a Sonenta line in our own missing handler. The mechanism story
+ * changed three times today; this test never did, because it asserts the
+ * BEHAVIOUR (does the screen repaint?) and not the mechanism.
  *
  * EXPECTED: RED on i18n-core <= 1.1.1 (no un-park). GREEN on >= 1.1.2.
  * The red IS the negative control: it proves this test can SEE the P1. If this
@@ -23,7 +30,7 @@ import { createSonentaI18n, useTranslation } from "@sonenta/vue-i18n";
 import { applyEdit } from "@sonenta/in-context/core";
 import { testI18nConfig, waitFor } from "./sdk-harness";
 
-// Absent from every bundle: it renders raw, and i18next parks it.
+// Absent from every bundle: it renders raw, and the SDK's missing handler parks it.
 const ABSENT_KEY = "promo.banner.headline";
 
 const Banner = defineComponent({
