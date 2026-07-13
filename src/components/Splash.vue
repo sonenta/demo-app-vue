@@ -1,27 +1,37 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { onUnmounted, ref, watch } from "vue";
 
 /**
  * First-paint cover: holds the page hidden (visually) for a beat while the
  * locale bundle loads, then fades out. We always render the page tree behind
  * it so the SDK kicks off the fetch immediately — Splash is purely cosmetic.
+ *
+ * CAPPED (react 34ab10d parity): `ready` waits on a network fetch, so gating
+ * the reveal on it alone lets a slow link hide the whole page indefinitely
+ * (measured "never" on 2G in the React sibling). After MAX_COVER_MS we reveal
+ * regardless — a page with a few keys still resolving beats no page at all,
+ * and the controls work meanwhile. Do NOT reintroduce an opacity/v-if gate on
+ * the page tree: the cap would then expire onto an empty screen.
  */
 const props = defineProps<{ ready: boolean }>();
+
+const MAX_COVER_MS = 1200;
 
 const mounted = ref(true);
 const fading = ref(false);
 
-watch(
-  () => props.ready,
-  (ready) => {
-    if (!ready || fading.value) return;
-    fading.value = true;
-    window.setTimeout(() => {
-      mounted.value = false;
-    }, 320);
-  },
-  { immediate: true },
-);
+const reveal = () => {
+  if (fading.value) return;
+  fading.value = true;
+  window.setTimeout(() => {
+    mounted.value = false;
+  }, 320);
+};
+
+watch(() => props.ready, (ready) => ready && reveal(), { immediate: true });
+
+const capId = window.setTimeout(reveal, MAX_COVER_MS);
+onUnmounted(() => window.clearTimeout(capId));
 </script>
 
 <template>

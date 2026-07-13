@@ -9,8 +9,8 @@ const app = createApp(App);
 
 app.use(router);
 
-// Official @sonenta/vue-i18n binding (beta 0.9.0 — replaces the former local
-// stub). The demo ships its own bundles in the SDK's CDN path layout under
+// Official @sonenta/vue-i18n binding (1.0.0 stable). The demo ships its own
+// bundles in the SDK's CDN path layout under
 // /cdn (`{cdnBase}/p/{projectUuid}/{version}/latest/{lang}/{ns}.json`), so it
 // stays offline / Vercel-safe while exercising the real SDK fetch pipeline.
 // projectUuid = the canonical "demo-public" project (backend). token is a
@@ -23,8 +23,12 @@ app.use(
     cdnBase: `${import.meta.env.BASE_URL}cdn`,
     version: "main",
     apiBase: "https://api.sonenta.com",
-    // Bundles are flat-keyed ("hero.lede"); set explicitly so resolution does
-    // not depend on version-metadata auto-detection (disabled below).
+    // Bundles are flat-keyed ("hero.lede"). KEEP THIS EXPLICIT: when omitted,
+    // the SDK auto-detects key_style from version metadata, which means a
+    // cross-origin GET {apiBase}/v1/projects/{uuid}/versions/{version} on every
+    // load. That endpoint is 401 for this demo (public CDN bundles, no API
+    // token), so every visitor would eat a failed request + console error for a
+    // value we already know. Resolution works either way — this keeps it offline.
     keySeparator: false,
     defaultLocale: "en",
     defaultNS: "common",

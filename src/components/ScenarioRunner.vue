@@ -9,13 +9,20 @@ import { missingStore } from "../state/missing-store";
  * exactly as a real user click would). Each view decides when to actually
  * start the scenario — see Home.vue and Demo.vue.
  */
-const { t } = useTranslation();
+const { t, i18n } = useTranslation();
 
 scenarioStore.attach(
   (key) => {
     t(key);
   },
-  () => missingStore.clear(),
+  () => {
+    missingStore.clear();
+    // The SDK dedups a missing key per instance — without this, the loop's
+    // 2nd cycle onward re-fires the same keys, the SDK reports NOTHING, and
+    // the inspector stays empty for the rest of the capture (verified: cycle 1
+    // reports 2 misses, cycle 2 reports 0). Needs i18n-core >= 1.1.1.
+    i18n.resetMissingDedup();
+  },
 );
 </script>
 

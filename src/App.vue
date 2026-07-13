@@ -25,10 +25,9 @@ const FeedbackPanel = computed(() => activeFeedback.value?.FeedbackPanel);
 <template>
   <Splash :ready="ready" />
   <ScenarioRunner />
-  <div
-    class="min-h-screen flex flex-col transition-opacity duration-300"
-    :class="ready ? 'opacity-100' : 'opacity-0'"
-  >
+  <!-- No ready-gate here: Splash caps its own cover at 1.2s, so hiding the tree
+       behind opacity would make that cap expire onto a blank screen. -->
+  <div class="min-h-screen flex flex-col">
     <RouterView />
   </div>
   <component :is="FeedbackPanel" v-if="FeedbackPanel" :key="language" />
