@@ -96,3 +96,34 @@ describe("locale switch", () => {
     expect(w.find("h1").element).toBe(node); // patched in place, not remounted
   }, 12000);
 });
+
+/**
+ * P0 REGRESSION LOCK — an empty key must not destroy the catalog.
+ *
+ * i18next's ResourceStore.addResource builds `path = [lng, ns]` and only
+ * concatenates the key `if (key)`. An EMPTY key is falsy, so the path stays two
+ * elements and setPath REPLACES THE WHOLE NAMESPACE. The SDK's missing-key park
+ * handed it exactly that: one t("") wiped 474 keys at a customer and the app
+ * rendered raw keys (buttons literally reading auth.signIn), silently.
+ *
+ * Reproduced here on i18n-core 1.1.6: 77 keys -> 0 on a single t(""). Fixed in
+ * 1.1.8. This demo calls t() with a VARIABLE in six places (t(f.titleKey),
+ * t(trig.labelKey), t(key), ...) — all fed from static arrays today, so one bad
+ * data entry away from losing the catalog in production. Hence the lock.
+ */
+describe("P0: an empty key must not wipe the catalog", () => {
+  it("survives t('') with every key intact", async () => {
+    const plugin = withI18n();
+    mount(defineComponent({ setup: () => () => h("i") }), { global: { plugins: [plugin] } });
+    await waitFor(() => plugin.i18n.ready, 8000);
+
+    const bundle = () => plugin.i18n.i18next.getResourceBundle("en", "common") ?? {};
+    const before = Object.keys(bundle()).length;
+    expect(before).toBeGreaterThan(50); // the real bundle, not an empty one
+
+    plugin.i18n.t(""); // the killer call
+
+    expect(Object.keys(bundle()).length).toBe(before); // catalog intact
+    expect(plugin.i18n.t("hero.title.line1")).toBe("Ship in every language.");
+  }, 12000);
+});
