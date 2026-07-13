@@ -74,16 +74,18 @@ describe("in-context edit of a key that was MISSING first", () => {
    * So the defect is a function of KEY STYLE, not of framework. A Vue customer
    * with nested bundles is still exposed. This case pins that.
    *
-   * `it.fails` = "this MUST fail today". It passes while the bug exists, and
-   * goes RED the moment i18n-core un-parks (1.1.2) — at which point delete
-   * `.fails` and let it assert the repaint normally. It is a tripwire, not an
-   * excuse: if it starts passing silently, we have lost the signal.
+   * TRIPWIRE FIRED, AS DESIGNED. This was pinned with `it.fails` (asserting the
+   * bug EXISTED) against i18n-core <= 1.1.1. On 1.1.2 it went red — i.e. the
+   * nested edit started repainting — so the un-park fix is confirmed IN A REAL
+   * CONSUMER, and the case is now a normal positive assertion. If the park ever
+   * comes back, this goes red instead of the feature going quietly dead.
    */
-  it.fails("NESTED keys: edit is SHADOWED by the park (P1, un-parked in 1.1.2)", async () => {
+  it("NESTED keys: edit repaints too (park-shadow P1 un-parked in i18n-core 1.1.2)", async () => {
     const plugin = createSonentaI18n({ ...testI18nConfig, keySeparator: "." });
     const wrapper = mount(Banner, { attachTo: document.body, global: { plugins: [plugin] } });
     await waitFor(() => wrapper.find("h2").attributes("data-ready") === "true");
     expect(wrapper.find("h2").text()).toBe(ABSENT_KEY);
+    const node = wrapper.find("h2").element;
 
     await applyEdit(plugin.i18n as never, {
       namespace: "common",
@@ -92,7 +94,10 @@ describe("in-context edit of a key that was MISSING first", () => {
       value: "Now it has a value.",
     });
 
-    // On <=1.1.1 this never happens: the flat park shadows the nested write.
-    await waitFor(() => wrapper.find("h2").text() !== ABSENT_KEY, 1500);
+    // On <=1.1.1 this never happened: the flat park shadowed the nested write.
+    await waitFor(() => wrapper.find("h2").text() !== ABSENT_KEY, 2000);
+
+    expect(wrapper.find("h2").text()).toBe("Now it has a value.");
+    expect(wrapper.find("h2").element).toBe(node); // patched in place
   }, 10000);
 });
