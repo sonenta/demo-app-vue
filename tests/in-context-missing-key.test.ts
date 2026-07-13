@@ -73,7 +73,7 @@ describe("in-context edit of a key that was MISSING first", () => {
    * THE PARK-SHADOW P1, PINNED.
    *
    * The test above passes — but ONLY because this demo is flat-keyed
-   * (keySeparator:false), so i18next's flat park and in-context's write agree.
+   * (keySeparator:false), so the flat park and in-context's write agree.
    * The P1 needs a flat-park / nested-write MISMATCH, which is what a
    * NESTED-keyed app (keySeparator:".", e.g. demo-app's prod bundles) has.
    * There the edit lands and the screen never changes.
