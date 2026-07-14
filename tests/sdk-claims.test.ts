@@ -166,45 +166,46 @@ describe("nullish and empty keys are handled gracefully", () => {
 });
 
 /**
- * TRIPWIRE — the a11y API still throws on nullish keys (i18n-core 1.1.10).
+ * THE FIVE A11Y DOORS — TRIPWIRE FIRED AND FLIPPED (fixed in i18n-core 1.1.11).
  *
- * t() was guarded in 1.1.8/1.1.9, and sdk announced both doors shut. They were
- * not: five sibling methods funnel through the same key-splitting line, which
- * dereferences a nullish key. sdk guarded the door they were looking at.
+ * t() was guarded in 1.1.8/1.1.9 and sdk announced both doors shut. They were
+ * not: five sibling methods funnelled through the same key-splitting line and
+ * still dereferenced a nullish key. asset() even carried its own INLINED copy of
+ * the split, so it survived the first joint guard.
  *
- * I enumerated all 14 key-taking public methods rather than trust the reported
- * list — because a defect report names one occurrence and is never evidence
- * there is only one. That found the right SET, and I still got the ANSWER wrong:
- * I first reported FOUR doors and called a11y() safe. It is FIVE.
+ * I pinned aria(undefined) with `it.fails`. On 1.1.11 it went RED — the throw is
+ * gone — so the fix is confirmed IN A REAL CONSUMER. Now a positive assertion
+ * over the WHOLE surface, deliberately covering the two axes I got wrong the
+ * first time:
  *
- * a11y() throws only when BOTH conditions hold:
- *   - it is called with its REQUIRED second argument, a11y(key, surface) — my
- *     sweep passed ONE argument to every method, so it returned early and looked
- *     safe. AN ENUMERATION THAT IGNORES EACH METHOD'S SIGNATURE TESTS NOTHING.
- *   - AND a11ySurfaces is configured. With surfaces unset it is safe even when
- *     called correctly.
+ *   ARITY  — a11y(key, surface) takes a REQUIRED second argument. My first sweep
+ *            passed one arg to every method, so a11y returned early and looked
+ *            safe. A one-arg probe of a two-arg method is a green that proves
+ *            nothing.
+ *   ROOM   — a11y only threw when a11ySurfaces was SET. A config is an INPUT: it
+ *            can hide the defect from the instrument looking for it.
  *
- * Verified as a matrix on 1.1.10 (doors x arity x config):
- *   aria / alt / asset / a11yAsset : THROW on undefined+null in every room
- *   a11y(key, surface)             : THROWS only when a11ySurfaces is SET
- *   t + the other 9 public methods : clean everywhere
- *
- * Two lessons, both mine: enumerate every door IN EVERY ROOM (a config is an
- * input, and it can hide the defect from the instrument looking for it), and
- * CALL EACH DOOR WITH ITS REAL SIGNATURE (a one-arg probe of a two-arg method is
- * a green that proves nothing).
- *
- * NOT A CRASH RISK FOR THIS DEMO: it calls no a11y API at all (grep: zero
- * sites). This tracks an SDK defect so my suite tells me when the real fix
- * (1.1.11, "guard at the joint") lands — as it did for the t() nullish fix.
- * `it.fails` = must throw today; goes RED when fixed.
+ * Verified on 1.1.11: 48 probes (5 doors x nullish x 2 config rooms x 2
+ * separators) — zero throwers.
  */
-describe("SDK defect tracker: a11y API on nullish keys", () => {
-  it.fails("aria(undefined) throws instead of returning gracefully", async () => {
-    const plugin = withI18n();
-    mount(defineComponent({ setup: () => () => h("i") }), { global: { plugins: [plugin] } });
-    await waitFor(() => plugin.i18n.ready, 8000);
+describe("a11y API: nullish keys are handled gracefully", () => {
+  it("no door throws, in either config room", async () => {
+    for (const surfaces of [undefined, ["aria_label", "alt_text"]]) {
+      const plugin = createSonentaI18n({
+        ...testI18nConfig,
+        ...(surfaces ? { a11ySurfaces: surfaces } : {}),
+      } as never);
+      mount(defineComponent({ setup: () => () => h("i") }), { global: { plugins: [plugin] } });
+      await waitFor(() => plugin.i18n.ready, 8000);
 
-    expect(() => plugin.i18n.aria(undefined as unknown as string)).not.toThrow();
-  }, 12000);
+      const e = plugin.i18n as never as Record<string, (...a: unknown[]) => unknown>;
+      for (const bad of [undefined, null]) {
+        expect(() => e.aria(bad)).not.toThrow();
+        expect(() => e.alt(bad)).not.toThrow();
+        expect(() => e.asset(bad)).not.toThrow();
+        expect(() => e.a11yAsset(bad)).not.toThrow();
+        expect(() => e.a11y(bad, "aria_label")).not.toThrow(); // REQUIRED 2nd arg
+      }
+    }
+  }, 20000);
 });

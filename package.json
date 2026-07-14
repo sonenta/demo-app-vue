@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@sonenta/feedback": "^1.2.0",
-    "@sonenta/i18n-core": "^1.1.10",
+    "@sonenta/i18n-core": "^1.1.11",
     "@sonenta/vue-i18n": "^1.1.1",
     "i18next": "^26.3.1",
     "vue": "^3.5.13",
