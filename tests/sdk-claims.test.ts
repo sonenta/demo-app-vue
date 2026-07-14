@@ -129,30 +129,38 @@ describe("P0: an empty key must not wipe the catalog", () => {
 });
 
 /**
- * TRIPWIRE — t(undefined) / t(null) still THROW (reported to sdk, unfixed as of
- * i18n-core 1.1.9).
+ * NULLISH KEYS — TRIPWIRE FIRED AND FLIPPED.
  *
- * The P0 (catalog wipe) is fixed: the catalog now survives every falsy key. But
- * sdk's own advisory tells customers to audit `t(someVar)` where the variable
- * "can ever be empty OR UNDEFINED" — and the nullish shapes never reach the
- * `if (!key) return` guard, because something calls key.indexOf() first. They
- * throw a TypeError instead.
+ * The P0 (one t("") wiping the whole catalog) was fixed in i18n-core 1.1.8. But
+ * the nullish shapes still THREW a TypeError: they never reached the
+ * `if (!key) return` guard, because something called key.indexOf() first. I
+ * reported that — sdk's own advisory tells customers to audit `t(someVar)` where
+ * the variable can be "empty OR UNDEFINED", so a customer following their own
+ * instructions hit a crash instead of a wipe. It matters more in Vue than React:
+ * a throw in render hits an error boundary in React; in Vue it kills the
+ * component.
  *
- * That matters more in Vue than in React: a throw inside render hits an error
- * boundary in React; in Vue it kills the component. A customer following sdk's
- * own how-to-check advice finds the undefined case and hits a crash.
- *
- * `it.fails` = this MUST throw today. It goes RED when sdk moves the guard
- * earlier (or coerces), at which point drop `.fails` and assert the graceful
- * return. My app never calls t(undefined) — every call site is fed from a static
- * array — so this tracks an SDK defect, not a bug of mine.
+ * I pinned it with `it.fails` (asserting the throw EXISTED). On i18n-core 1.1.10
+ * it went RED — i.e. the throw was gone — so the fix is confirmed IN A REAL
+ * CONSUMER and the case is now a normal positive assertion. My suite told me the
+ * fix had landed; sdk did not have to remember to.
  */
-describe("SDK defect tracker: nullish keys", () => {
-  it.fails("t(undefined) throws instead of returning gracefully", async () => {
+describe("nullish and empty keys are handled gracefully", () => {
+  it("returns empty and leaves the catalog intact", async () => {
     const plugin = withI18n();
     mount(defineComponent({ setup: () => () => h("i") }), { global: { plugins: [plugin] } });
     await waitFor(() => plugin.i18n.ready, 8000);
 
-    expect(() => plugin.i18n.t(undefined as unknown as string)).not.toThrow();
+    const bundle = () => plugin.i18n.i18next.getResourceBundle("en", "common") ?? {};
+    const before = Object.keys(bundle()).length;
+    expect(before).toBeGreaterThan(50);
+
+    for (const bad of ["", undefined, null]) {
+      expect(() => plugin.i18n.t(bad as unknown as string)).not.toThrow();
+      expect(plugin.i18n.t(bad as unknown as string)).toBe("");
+    }
+
+    expect(Object.keys(bundle()).length).toBe(before); // catalog never wiped
+    expect(plugin.i18n.t("hero.title.line1")).toBe("Ship in every language.");
   }, 12000);
 });
