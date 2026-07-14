@@ -164,3 +164,31 @@ describe("nullish and empty keys are handled gracefully", () => {
     expect(plugin.i18n.t("hero.title.line1")).toBe("Ship in every language.");
   }, 12000);
 });
+
+/**
+ * TRIPWIRE — the a11y API still throws on nullish keys (i18n-core 1.1.10).
+ *
+ * t() was guarded in 1.1.8/1.1.9, and sdk announced both doors shut. They were
+ * not: five sibling methods funnel through the same key-splitting line, which
+ * dereferences a nullish key. sdk guarded the door they were looking at.
+ *
+ * I ENUMERATED ALL 14 key-taking public methods rather than trust the reported
+ * list — because a defect report names one occurrence and is never evidence
+ * there is only one. Result on 1.1.10: exactly FOUR throw — aria, alt, asset,
+ * a11yAsset (undefined and null each). a11y() does NOT, though sdk listed it.
+ * Nothing else does. That is the complete door list, found by sweep, not report.
+ *
+ * NOT A CRASH RISK FOR THIS DEMO: it calls no a11y API at all (grep: zero
+ * sites). This tracks an SDK defect so my suite tells me when the real fix
+ * (1.1.11, "guard at the joint") lands — as it did for the t() nullish fix.
+ * `it.fails` = must throw today; goes RED when fixed.
+ */
+describe("SDK defect tracker: a11y API on nullish keys", () => {
+  it.fails("aria(undefined) throws instead of returning gracefully", async () => {
+    const plugin = withI18n();
+    mount(defineComponent({ setup: () => () => h("i") }), { global: { plugins: [plugin] } });
+    await waitFor(() => plugin.i18n.ready, 8000);
+
+    expect(() => plugin.i18n.aria(undefined as unknown as string)).not.toThrow();
+  }, 12000);
+});
