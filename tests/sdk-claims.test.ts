@@ -172,11 +172,27 @@ describe("nullish and empty keys are handled gracefully", () => {
  * not: five sibling methods funnel through the same key-splitting line, which
  * dereferences a nullish key. sdk guarded the door they were looking at.
  *
- * I ENUMERATED ALL 14 key-taking public methods rather than trust the reported
+ * I enumerated all 14 key-taking public methods rather than trust the reported
  * list — because a defect report names one occurrence and is never evidence
- * there is only one. Result on 1.1.10: exactly FOUR throw — aria, alt, asset,
- * a11yAsset (undefined and null each). a11y() does NOT, though sdk listed it.
- * Nothing else does. That is the complete door list, found by sweep, not report.
+ * there is only one. That found the right SET, and I still got the ANSWER wrong:
+ * I first reported FOUR doors and called a11y() safe. It is FIVE.
+ *
+ * a11y() throws only when BOTH conditions hold:
+ *   - it is called with its REQUIRED second argument, a11y(key, surface) — my
+ *     sweep passed ONE argument to every method, so it returned early and looked
+ *     safe. AN ENUMERATION THAT IGNORES EACH METHOD'S SIGNATURE TESTS NOTHING.
+ *   - AND a11ySurfaces is configured. With surfaces unset it is safe even when
+ *     called correctly.
+ *
+ * Verified as a matrix on 1.1.10 (doors x arity x config):
+ *   aria / alt / asset / a11yAsset : THROW on undefined+null in every room
+ *   a11y(key, surface)             : THROWS only when a11ySurfaces is SET
+ *   t + the other 9 public methods : clean everywhere
+ *
+ * Two lessons, both mine: enumerate every door IN EVERY ROOM (a config is an
+ * input, and it can hide the defect from the instrument looking for it), and
+ * CALL EACH DOOR WITH ITS REAL SIGNATURE (a one-arg probe of a two-arg method is
+ * a green that proves nothing).
  *
  * NOT A CRASH RISK FOR THIS DEMO: it calls no a11y API at all (grep: zero
  * sites). This tracks an SDK defect so my suite tells me when the real fix
